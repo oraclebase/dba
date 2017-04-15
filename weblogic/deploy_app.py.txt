@@ -1,0 +1,75 @@
+#!/usr/bin/python
+# Author : Tim Hall
+# Save Script as : deploy_app.py
+#
+# Requirements:
+#
+# Set the environment and start WLST
+#
+# export MW_HOME=/u01/app/oracle/middleware
+# export DOMAIN_HOME=$MW_HOME/user_projects/domains/myDomain
+# . $DOMAIN_HOME/bin/setDomainEnv.sh
+# java weblogic.WLST
+# 
+# Connect to the admin server and store the credentials.
+#
+# connect('weblogic', 'password1', 't3://myserver.localdomain:7001')
+# configfile = '/home/oracle/scripts/appconfigfile.secure'
+# keyfile = '/home/oracle/scripts/appkeyfile.secure'
+# storeUserConfig(userConfigFile=configfile, userKeyFile=keyfile)
+# disconnect()
+# exit()
+#
+
+import time
+import getopt
+import sys
+import re
+
+# Get parameter values.
+configfile = '/home/oracle/scripts/appconfigfile.secure'
+keyfile = '/home/oracle/scripts/appkeyfile.secure'
+adminurl = 't3://myserver.localdomain:7001'
+app = ''
+path = ''
+targetlist = 'myServer_1'
+try:
+   opts, args = getopt.getopt(sys.argv[1:],"p:a:t:h::",["path=","app=","targetlist="])
+except getopt.GetoptError:
+   print 'deploy_birms_app.py -p <path-to-ear> [-a <application>] [-t <targetlist>]'
+   sys.exit(2)
+for opt, arg in opts:
+   if opt == '-h':
+      print 'deploy_birms_app.py -p <path-to-ear> [-a <application>] [-t <targetlist>]'
+      sys.exit()
+   elif opt in ("-a", "--app"):
+      app = arg
+   elif opt in ("-p", "--path"):
+      path = arg
+   elif opt in ("-t", "--targetlist"):
+      targetlist = arg
+if app == '':
+   app = os.path.basename(path)
+   app = os.path.splitext(app)[0]
+print 'app=', app
+print 'path=', path
+print 'targetlist=', targetlist
+
+# Undeploy then deploy the application.
+connect(userConfigFile=configfile, userKeyFile=keyfile, url=adminurl)
+#edit()
+#startEdit()
+
+try:
+  undeploy(app)
+except:
+  print '**********************************************************'
+  print '***** Failed to undeploy. Is it a first-time deploy? *****'
+  print '**********************************************************'
+
+deploy(app,path,targets=targetlist)
+
+#save()
+#activate()
+disconnect()
+exit()
