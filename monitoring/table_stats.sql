@@ -9,6 +9,8 @@
 SET LINESIZE 300 VERIFY OFF
 
 COLUMN owner FORMAT A20
+COLUMN table_name FORMAT A30
+COLUMN index_name FORMAT A30
 
 SELECT owner,
        table_name,

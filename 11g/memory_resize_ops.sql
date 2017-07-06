@@ -4,7 +4,7 @@
 -- Description  : Provides information about memory resize operations.
 -- Requirements : Access to the v$ views.
 -- Call Syntax  : @memory_resize_ops
--- Last Modified: 23/08/2008
+-- Last Modified: 09/05/2017
 -- -----------------------------------------------------------------------------------
 
 SET LINESIZE 200
@@ -17,9 +17,9 @@ SELECT start_time,
        oper_type,
        oper_mode,
        parameter,
-       ROUND(initial_size/1024/1204) AS initial_size_mb,
-       ROUND(target_size/1024/1204) AS target_size_mb,
-       ROUND(final_size/1024/1204) AS final_size_mb,
+       ROUND(initial_size/1024/1024) AS initial_size_mb,
+       ROUND(target_size/1024/1024) AS target_size_mb,
+       ROUND(final_size/1024/1024) AS final_size_mb,
        status
 FROM   v$memory_resize_ops
 ORDER BY start_time;
