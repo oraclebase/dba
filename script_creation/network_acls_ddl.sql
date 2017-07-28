@@ -80,7 +80,7 @@ BEGIN
       DBMS_OUTPUT.put_line('    is_grant  => ' || i.is_grant || ',');
       DBMS_OUTPUT.put_line('    privilege => ''' || i.privilege || ''',');
       DBMS_OUTPUT.put_line('    start_date   => ' || get_timestamp(i.start_date) || ',');
-      DBMS_OUTPUT.put_line('    end_date     => ' || get_timestamp(i.start_date) || ');');
+      DBMS_OUTPUT.put_line('    end_date     => ' || get_timestamp(i.end_date) || ');');
       DBMS_OUTPUT.put_line('  COMMIT;');
       DBMS_OUTPUT.put_line('END;');
       DBMS_OUTPUT.put_line('/');
