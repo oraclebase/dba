@@ -1,16 +1,17 @@
 -- -----------------------------------------------------------------------------------
--- File Name    : https://oracle-base.com/dba/script_creation/network_acls_ddl.sql
+-- File Name    : https://oracle-base.com/dba/11g/network_acls_ddl.sql
 -- Author       : Tim Hall
 -- Description  : Displays DDL for all network ACLs.
 -- Requirements : Access to the DBA views.
 -- Call Syntax  : @network_acls_ddl
--- Last Modified: 14-DEV-2016
+-- Last Modified: 28-JUL-2017
 -- -----------------------------------------------------------------------------------
 
 SET SERVEROUTPUT ON FORMAT WRAPPED LINESIZE 300
 DECLARE
   l_last_acl       dba_network_acls.acl%TYPE                 := '~';
   l_last_principal dba_network_acl_privileges.principal%TYPE := '~';
+  l_last_privilege dba_network_acl_privileges.privilege%TYPE := '~';
   l_last_host      dba_network_acls.host%TYPE                := '~';
 
   FUNCTION get_timestamp (p_timestamp IN TIMESTAMP WITH TIME ZONE)
@@ -66,9 +67,11 @@ BEGIN
       DBMS_OUTPUT.put_line(' ');
       l_last_acl := i.acl;
       l_last_principal := i.principal;
+      l_last_privilege := i.privilege;
     END IF;
 
-    IF l_last_principal <> i.principal THEN
+    IF l_last_principal <> i.principal 
+    OR (l_last_principal = i.principal AND l_last_privilege <> i.privilege) THEN
       -- Add another principal to an existing ACL.
       DBMS_OUTPUT.put_line('BEGIN');
       DBMS_OUTPUT.put_line('  DBMS_NETWORK_ACL_ADMIN.add_privilege (');
@@ -83,6 +86,7 @@ BEGIN
       DBMS_OUTPUT.put_line('/');
       DBMS_OUTPUT.put_line(' ');
       l_last_principal := i.principal;
+      l_last_privilege := i.privilege;
     END IF;
 
     IF l_last_host <> i.host||':'||i.lower_port||':'||i.upper_port THEN
