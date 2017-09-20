@@ -38,6 +38,7 @@ CREATE OR REPLACE PACKAGE BODY string_api AS
 --   When         Who       What
 --   ===========  ========  =================================================
 --   02-DEC-2004  Tim Hall  Initial Creation
+--   31-AUG-2017  Tim Hall  SUBSTR parameters switched.
 -- --------------------------------------------------------------------------
 
 -- ----------------------------------------------------------------------------
@@ -80,7 +81,7 @@ PROCEDURE print_clob (p_clob IN CLOB) IS
 BEGIN
   LOOP
     EXIT WHEN l_offset > LENGTH(p_clob);
-    DBMS_OUTPUT.put_line(SUBSTR(p_clob, l_chunk, l_offset));
+    DBMS_OUTPUT.put_line(SUBSTR(p_clob, l_offset, l_chunk));
     l_offset := l_offset + l_chunk;
   END LOOP;
 END print_clob;
@@ -96,7 +97,7 @@ PROCEDURE print_clob_old (p_clob IN CLOB) IS
 BEGIN
   LOOP
     EXIT WHEN l_offset > DBMS_LOB.getlength(p_clob);
-    DBMS_OUTPUT.put_line(DBMS_LOB.substr(p_clob, l_chunk, l_offset));
+    DBMS_OUTPUT.put_line(DBMS_LOB.substr(p_clob, l_offset, l_chunk));
     l_offset := l_offset + l_chunk;
   END LOOP;
 END print_clob_old;
@@ -112,7 +113,7 @@ PROCEDURE print_clob_htp (p_clob IN CLOB) IS
 BEGIN
   LOOP
     EXIT WHEN l_offset > LENGTH(p_clob);
-    HTP.prn(SUBSTR(p_clob, l_chunk, l_offset));
+    HTP.prn(SUBSTR(p_clob, l_offset, l_chunk));
     l_offset := l_offset + l_chunk;
   END LOOP;
 END print_clob_htp;
@@ -128,7 +129,7 @@ PROCEDURE print_clob_htp_old (p_clob IN CLOB) IS
 BEGIN
   LOOP
     EXIT WHEN l_offset > DBMS_LOB.getlength(p_clob);
-    HTP.prn(DBMS_LOB.substr(p_clob, l_chunk, l_offset));
+    HTP.prn(DBMS_LOB.substr(p_clob, l_offset, l_chunk));
     l_offset := l_offset + l_chunk;
   END LOOP;
 END print_clob_htp_old;
