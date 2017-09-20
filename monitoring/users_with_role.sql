@@ -8,6 +8,7 @@
 -- -----------------------------------------------------------------------------------
 
 SET VERIFY OFF
+COLUMN username FORMAT A30
 
 SELECT username,
        lock_date,
