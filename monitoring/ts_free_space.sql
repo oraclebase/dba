@@ -5,8 +5,9 @@
 -- Requirements : Access to the DBA views.
 -- Call Syntax  : @ts_free_space.sql
 -- Last Modified: 13-OCT-2012 - Created. Based on ts_full.sql
+--                22-SEP-2017 - LINESIZE set.
 -- -----------------------------------------------------------------------------------
-SET PAGESIZE 140
+SET PAGESIZE 140 LINESIZE 200
 COLUMN used_pct FORMAT A11
 
 SELECT tablespace_name,
