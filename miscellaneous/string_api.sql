@@ -8,6 +8,7 @@ CREATE OR REPLACE PACKAGE string_api AS
 --   When         Who       What
 --   ===========  ========  =================================================
 --   02-DEC-2004  Tim Hall  Initial Creation
+--   19-JAN-2017  Tim Hall  Add get_uri_paramter_value function.
 -- --------------------------------------------------------------------------
 
 -- Public types
@@ -22,6 +23,10 @@ PROCEDURE print_clob_old (p_clob  IN  CLOB);
 
 PROCEDURE print_clob_htp (p_clob  IN  CLOB);
 PROCEDURE print_clob_htp_old (p_clob  IN  CLOB);
+
+FUNCTION get_uri_paramter_value (p_uri         IN  VARCHAR2,
+                                 p_param_name  IN  VARCHAR2)
+  RETURN VARCHAR2;
 
 END string_api;
 /
@@ -39,12 +44,22 @@ CREATE OR REPLACE PACKAGE BODY string_api AS
 --   ===========  ========  =================================================
 --   02-DEC-2004  Tim Hall  Initial Creation
 --   31-AUG-2017  Tim Hall  SUBSTR parameters switched.
+--   19-JAN-2017  Tim Hall  Add get_uri_paramter_value function.
 -- --------------------------------------------------------------------------
+
+-- Variables to support the URI functionality.
+TYPE t_uri_array IS TABLE OF VARCHAR2(32767) INDEX BY VARCHAR2(32767);
+g_last_uri VARCHAR2(32767) := 'initialized';
+g_uri_tab  t_uri_array;
+
+
 
 -- ----------------------------------------------------------------------------
 FUNCTION split_text (p_text       IN  CLOB,
                      p_delimeter  IN  VARCHAR2 DEFAULT ',')
   RETURN t_split_array IS
+-- ----------------------------------------------------------------------------
+-- Could be replaced by APEX_UTIL.STRING_TO_TABLE.
 -- ----------------------------------------------------------------------------
   l_array  t_split_array   := t_split_array();
   l_text   CLOB := p_text;
@@ -133,6 +148,48 @@ BEGIN
     l_offset := l_offset + l_chunk;
   END LOOP;
 END print_clob_htp_old;
+-- ----------------------------------------------------------------------------
+
+
+
+-- ----------------------------------------------------------------------------
+FUNCTION get_uri_paramter_value (p_uri         IN  VARCHAR2,
+                                 p_param_name  IN  VARCHAR2)
+  RETURN VARCHAR2 IS
+-- ----------------------------------------------------------------------------
+-- Example:
+-- l_uri := 'https://localhost:8080/my_page.php?param1=value1&param2=value2&param3=value3';
+-- l_value := string_api.get_uri_paramter_value(l_uri, 'param1')
+-- ----------------------------------------------------------------------------
+  l_uri    VARCHAR2(32767);
+  l_array  t_split_array   := t_split_array();
+  l_idx    NUMBER;
+BEGIN
+  IF p_uri IS NULL OR p_param_name IS NULL THEN
+    RAISE_APPLICATION_ERROR(-20000, 'p_uri and p_param_name must be specified.');
+  END IF;
+  
+  IF p_uri != g_last_uri THEN
+    -- First time we've seen this URI, so build the key-value table.
+    g_uri_tab.DELETE;
+    g_last_uri := p_uri;
+    l_uri      := TRANSLATE(g_last_uri, '&?', '^^');
+    l_array    := split_text(l_uri, '^');
+    FOR i IN 1 .. l_array.COUNT LOOP
+      l_idx := INSTR(l_array(i), '=');
+      IF l_idx != 0 THEN
+        g_uri_tab(SUBSTR(l_array(i), 1, l_idx - 1)) := SUBSTR(l_array(i), l_idx + 1);
+        --DBMS_OUTPUT.put_line('param_name=' || SUBSTR(l_array(i), 1, l_idx - 1) ||
+        --                     ' | param_value=' || SUBSTR(l_array(i), l_idx + 1));
+      END IF;
+    END LOOP;
+  END IF;
+  
+  RETURN g_uri_tab(p_param_name);
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    RETURN NULL;
+END get_uri_paramter_value;
 -- ----------------------------------------------------------------------------
 
 END string_api;
