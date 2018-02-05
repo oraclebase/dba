@@ -65,6 +65,9 @@ CREATE OR REPLACE PACKAGE BODY ftp AS
 --   24-Oct-2016  Tim Hall  Removed passive connections for mkdir, rmdir, rename, delete (suggested by Dirk).
 --   22-Jan-2017  Tim Hall  Added UTL_TCP.close_connection for passive connections to exception handlers for
 --                          get_direct, put_direct, list, nlst (Peter Renner).
+--   05-Jan-2018  Tim Hall  get_local_ascii_data : Switch from LOADFROMFILE to LOADCLOBFROMFILE.
+--                          get_local_binary_data : Switch from LOADFROMFILE to LOADBLOBFROMFILE.
+--                          (suggested by Stephen Skene)
 -- --------------------------------------------------------------------------
 
 g_reply         t_string_table := t_string_table();
@@ -186,8 +189,14 @@ FUNCTION get_local_ascii_data (p_dir   IN  VARCHAR2,
                                p_file  IN  VARCHAR2)
   RETURN CLOB IS
 -- --------------------------------------------------------------------------
-  l_bfile   BFILE;
-  l_data    CLOB;
+  l_bfile         BFILE;
+  l_data          CLOB;
+  l_dest_offset   INTEGER := 1;
+  l_src_offset    INTEGER := 1;
+  l_bfile_csid    NUMBER  := 0;
+  l_lang_context  INTEGER := 0;
+  l_warning       INTEGER := 0;
+
 BEGIN
   DBMS_LOB.createtemporary (lob_loc => l_data,
                             cache   => TRUE,
@@ -197,7 +206,15 @@ BEGIN
   DBMS_LOB.fileopen(l_bfile, DBMS_LOB.file_readonly);
 
   IF DBMS_LOB.getlength(l_bfile) > 0 THEN
-    DBMS_LOB.loadfromfile(l_data, l_bfile, DBMS_LOB.getlength(l_bfile));
+    DBMS_LOB.loadclobfromfile (
+      dest_lob      => l_data,
+      src_bfile     => l_bfile,
+      amount        => DBMS_LOB.lobmaxsize,
+      dest_offset   => l_dest_offset,
+      src_offset    => l_src_offset,
+      bfile_csid    => l_bfile_csid ,
+      lang_context  => l_lang_context,
+      warning       => l_warning);
   END IF;
 
   DBMS_LOB.fileclose(l_bfile);
@@ -213,8 +230,10 @@ FUNCTION get_local_binary_data (p_dir   IN  VARCHAR2,
                                 p_file  IN  VARCHAR2)
   RETURN BLOB IS
 -- --------------------------------------------------------------------------
-  l_bfile   BFILE;
-  l_data    BLOB;
+  l_bfile       BFILE;
+  l_data        BLOB;
+  l_dest_offset INTEGER := 1;
+  l_src_offset  INTEGER := 1;
 BEGIN
   DBMS_LOB.createtemporary (lob_loc => l_data,
                             cache   => TRUE,
@@ -223,7 +242,12 @@ BEGIN
   l_bfile := BFILENAME(p_dir, p_file);
   DBMS_LOB.fileopen(l_bfile, DBMS_LOB.file_readonly);
   IF DBMS_LOB.getlength(l_bfile) > 0 THEN
-    DBMS_LOB.loadfromfile(l_data, l_bfile, DBMS_LOB.getlength(l_bfile));
+    DBMS_LOB.loadblobfromfile (
+      dest_lob    => l_data,
+      src_bfile   => l_bfile,
+      amount      => DBMS_LOB.lobmaxsize,
+      dest_offset => l_dest_offset,
+      src_offset  => l_src_offset);
   END IF;
   DBMS_LOB.fileclose(l_bfile);
 
