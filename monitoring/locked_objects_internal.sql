@@ -1,10 +1,10 @@
 -- -----------------------------------------------------------------------------------
--- File Name    : https://oracle-base.com/dba/monitoring/locked_objects_internal.sql
+-- File Name    : http://www.oracle-base.com/dba/monitoring/locked_objects_internal.sql
 -- Author       : Tim Hall
 -- Description  : Lists all locks on the specific object.
 -- Requirements : Access to the DBA views.
 -- Call Syntax  : @locked_objects_internal (object-name)
--- Last Modified: 15/07/2000
+-- Last Modified: 16/02/2018
 -- -----------------------------------------------------------------------------------
 SET LINESIZE 1000 VERIFY OFF
 
@@ -23,6 +23,6 @@ SELECT li.session_id AS sid,
        li.lock_id2
 FROM   dba_lock_internal li
        JOIN v$session s ON li.session_id = s.sid
-WHERE  UPPER(lock_id1) LIKE '%&1%';
+WHERE  UPPER(lock_id1) LIKE UPPER('%&1%');
 
 SET VERIFY ON
