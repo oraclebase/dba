@@ -3,7 +3,7 @@
 -- Author       : Tim Hall
 -- Description  : Displays the DDL for a specific user.
 -- Call Syntax  : @user_ddl (username)
--- Last Modified: 28/01/2006
+-- Last Modified: 07/08/2018
 -- -----------------------------------------------------------------------------------
 
 set long 20000 longchunksize 20000 pagesize 0 linesize 1000 feedback off verify off trimspool on
@@ -17,7 +17,7 @@ end;
  
 variable v_username VARCHAR2(30);
 
-exec:v_username := upper('&1');
+exec :v_username := upper('&1');
 
 select dbms_metadata.get_ddl('USER', u.username) AS ddl
 from   dba_users u
