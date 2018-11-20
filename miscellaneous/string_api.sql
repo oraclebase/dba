@@ -45,6 +45,7 @@ CREATE OR REPLACE PACKAGE BODY string_api AS
 --   02-DEC-2004  Tim Hall  Initial Creation
 --   31-AUG-2017  Tim Hall  SUBSTR parameters switched.
 --   19-JAN-2017  Tim Hall  Add get_uri_paramter_value function.
+--   20-NOV-2018  Tim Hall  Reduce the chunk sizes to allow for multibyte character sets.
 -- --------------------------------------------------------------------------
 
 -- Variables to support the URI functionality.
@@ -124,7 +125,7 @@ END print_clob_old;
 PROCEDURE print_clob_htp (p_clob IN CLOB) IS
 -- ----------------------------------------------------------------------------
   l_offset NUMBER := 1;
-  l_chunk  NUMBER := 32767;
+  l_chunk  NUMBER := 3000;
 BEGIN
   LOOP
     EXIT WHEN l_offset > LENGTH(p_clob);
@@ -140,7 +141,7 @@ END print_clob_htp;
 PROCEDURE print_clob_htp_old (p_clob IN CLOB) IS
 -- ----------------------------------------------------------------------------
   l_offset NUMBER := 1;
-  l_chunk  NUMBER := 32767;
+  l_chunk  NUMBER := 3000;
 BEGIN
   LOOP
     EXIT WHEN l_offset > DBMS_LOB.getlength(p_clob);
