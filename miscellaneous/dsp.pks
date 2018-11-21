@@ -17,6 +17,7 @@ CREATE OR REPLACE PACKAGE dsp AUTHID CURRENT_USER AS
 --   02-DEC-2013  Tim Hall  Add p_trace_level parameter to most code to
 --                          limit amount of trace produced.
 --                          Added "AUTHID CURRENT_USER".
+--   21-NOV-2018  Tim Hall  Add CLOB overloads to LINE.
 -- --------------------------------------------------------------------------
 -- Example usage :
 /*
@@ -80,6 +81,9 @@ EXEC DSP.delete_file('TEST_DIR', 'test.txt');
   PROCEDURE line (p_data         IN  VARCHAR2,
                   p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info);
 
+  PROCEDURE line (p_data         IN  CLOB,
+                  p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info);
+
   PROCEDURE line (p_data         IN  NUMBER,
                   p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info);
 
@@ -92,6 +96,10 @@ EXEC DSP.delete_file('TEST_DIR', 'test.txt');
 
   PROCEDURE line (p_prefix       IN  VARCHAR2,
                   p_data         IN  VARCHAR2,
+                  p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info);
+
+  PROCEDURE line (p_prefix       IN  VARCHAR2,
+                  p_data         IN  CLOB,
                   p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info);
 
   PROCEDURE line (p_prefix       IN  VARCHAR2,

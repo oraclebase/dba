@@ -19,19 +19,20 @@ CREATE OR REPLACE PACKAGE BODY dsp AS
 --   02-DEC-2013  Tim Hall  Add p_trace_level parameter to most code to
 --                          limit amount of trace produced.
 --                          Prefixed UTL_FILE references with "SYS.".
+--   21-NOV-2018  Tim Hall  Add CLOB overloads to LINE.
 -- --------------------------------------------------------------------------
 
 -- Package Variables
-g_show_output  BOOLEAN         := FALSE;
-g_show_date    BOOLEAN         := FALSE;
-g_line_wrap    BOOLEAN         := TRUE;
-g_max_width    PLS_INTEGER     := 255;
-g_date_format  VARCHAR2(32767) := 'DD-MON-YYYY HH24:MI:SS.FF';
-g_file_dir     VARCHAR2(32767) := NULL;
-g_file_name    VARCHAR2(32767) := NULL;
-g_last_prefix  VARCHAR2(32767) := NULL;
-g_last_data    VARCHAR2(32767) := NULL;
-g_trace_level  PLS_INTEGER     := DSP.trace_level_all;
+g_show_output     BOOLEAN         := FALSE;
+g_show_date       BOOLEAN         := FALSE;
+g_line_wrap       BOOLEAN         := TRUE;
+g_max_width       PLS_INTEGER     := 255;
+g_date_format     VARCHAR2(32767) := 'DD-MON-YYYY HH24:MI:SS.FF';
+g_file_dir        VARCHAR2(32767) := NULL;
+g_file_name       VARCHAR2(32767) := NULL;
+g_last_prefix     VARCHAR2(32767) := NULL;
+g_last_data       VARCHAR2(32767) := NULL;
+g_trace_level     PLS_INTEGER     := DSP.trace_level_all;
 
 -- Hidden Methods
 PROCEDURE display (p_prefix       IN  VARCHAR2,
@@ -39,8 +40,15 @@ PROCEDURE display (p_prefix       IN  VARCHAR2,
                    p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info,
                    p_wrap         IN  BOOLEAN := FALSE);
 
+PROCEDURE display_clob (p_prefix       IN  VARCHAR2,
+                        p_data         IN  CLOB,
+                        p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info);
+
 PROCEDURE wrap_line (p_data         IN  VARCHAR2,
                      p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info);
+
+PROCEDURE wrap_line_clob (p_data         IN  CLOB,
+                          p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info);
 
 PROCEDURE output (p_data  IN  VARCHAR2);
 
@@ -186,6 +194,16 @@ END;
 
 
 -- --------------------------------------------------------------------------
+PROCEDURE line (p_data         IN  CLOB,
+                p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info) IS
+-- --------------------------------------------------------------------------
+BEGIN
+  display_clob (NULL, p_data, p_trace_level);
+END;
+-- --------------------------------------------------------------------------
+
+
+-- --------------------------------------------------------------------------
 PROCEDURE line (p_data         IN  NUMBER,
                 p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info) IS
 -- --------------------------------------------------------------------------
@@ -223,6 +241,17 @@ PROCEDURE line (p_prefix       IN  VARCHAR2,
 -- --------------------------------------------------------------------------
 BEGIN
   display (p_prefix, p_data, p_trace_level);
+END;
+-- --------------------------------------------------------------------------
+
+
+-- --------------------------------------------------------------------------
+PROCEDURE line (p_prefix       IN  VARCHAR2,
+                p_data         IN  CLOB,
+                p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info) IS
+-- --------------------------------------------------------------------------
+BEGIN
+  display_clob (p_prefix, p_data, p_trace_level);
 END;
 -- --------------------------------------------------------------------------
 
@@ -304,16 +333,62 @@ END;
 -- --------------------------------------------------------------------------
 
 
+
+-- --------------------------------------------------------------------------
+PROCEDURE display_clob (p_prefix       IN  VARCHAR2,
+                        p_data         IN  CLOB,
+                        p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info) IS
+-- --------------------------------------------------------------------------
+  l_data  CLOB := p_data;
+BEGIN
+  g_last_prefix := p_prefix;
+
+  IF g_show_output AND p_trace_level <= g_trace_level THEN
+    IF l_data IS NULL THEN
+      l_data := '<NULL>';
+    END IF;
+
+    IF p_prefix IS NOT NULL THEN
+      l_data := p_prefix || ' : ' || l_data;
+    END IF;
+
+    IF g_show_date THEN
+      l_data := TO_CHAR(SYSTIMESTAMP, g_date_format) || ' : ' || l_data;
+    END IF;
+
+    wrap_line_clob (l_data);
+  END IF;
+END;
+-- --------------------------------------------------------------------------
+
+
+
 -- --------------------------------------------------------------------------
 PROCEDURE wrap_line (p_data         IN  VARCHAR2,
                      p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info) IS
 -- --------------------------------------------------------------------------
-  l_data  VARCHAR2(32767) := p_data;
+  l_offset NUMBER := 1;
 BEGIN
   LOOP
-    display (NULL, SUBSTR(l_data, 1, g_max_width), p_trace_level, TRUE);
-    l_data := SUBSTR(l_data, g_max_width + 1);
-    EXIT WHEN l_data IS NULL;
+    EXIT WHEN l_offset > LENGTH(p_data);
+    display (NULL, SUBSTR(p_data, l_offset, g_max_width), p_trace_level, TRUE);
+    l_offset := l_offset + g_max_width;
+  END LOOP;
+END;
+-- --------------------------------------------------------------------------
+
+
+
+-- --------------------------------------------------------------------------
+PROCEDURE wrap_line_clob (p_data         IN  CLOB,
+                          p_trace_level  IN  PLS_INTEGER := DSP.trace_level_info) IS
+-- --------------------------------------------------------------------------
+  l_offset NUMBER := 1;
+BEGIN
+  LOOP
+    EXIT WHEN l_offset > LENGTH(p_data);
+    display (NULL, SUBSTR(p_data, l_offset, g_max_width), p_trace_level, TRUE);
+    l_offset := l_offset + g_max_width;
   END LOOP;
 END;
 -- --------------------------------------------------------------------------
