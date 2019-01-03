@@ -16,7 +16,8 @@
 --                          20 SMITH,FORD,ADAMS,SCOTT,JONES
 --                          30 ALLEN,BLAKE,MARTIN,TURNER,JAMES,WARD
 --                  
--- Last Modified: 20-APR-2005
+-- Last Modified: 03-JAN-2018 : Correction to separator handling in ODCIAggregateTerminate
+--                              and ODCIAggregateMerge, suggested by Kim Berg Hansen.
 -- -----------------------------------------------------------------------------------
 CREATE OR REPLACE TYPE t_string_agg AS OBJECT
 (
@@ -63,7 +64,7 @@ CREATE OR REPLACE TYPE BODY t_string_agg IS
                                          flags        IN   NUMBER)
     RETURN NUMBER IS
   BEGIN
-    returnValue := RTRIM(LTRIM(SELF.g_string, ','), ',');
+    returnValue := SUBSTR(SELF.g_string, 2);
     RETURN ODCIConst.Success;
   END;
 
@@ -71,7 +72,7 @@ CREATE OR REPLACE TYPE BODY t_string_agg IS
                                      ctx2  IN      t_string_agg)
     RETURN NUMBER IS
   BEGIN
-    SELF.g_string := SELF.g_string || ',' || ctx2.g_string;
+    SELF.g_string := SELF.g_string || ctx2.g_string;
     RETURN ODCIConst.Success;
   END;
 END;
