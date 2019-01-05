@@ -4,9 +4,9 @@
 -- Description  : Displays information about lockdown profiles.
 -- Requirements : Access to the DBA views.
 -- Call Syntax  : @lockdown_profiles
--- Last Modified: 30/06/2018
+-- Last Modified: 05/01/2019 - Increase the LINESIZE setting.
 -- -----------------------------------------------------------------------------------
-SET LINESIZE 200
+SET LINESIZE 210
 
 COLUMN profile_name FORMAT A30
 COLUMN rule_type FORMAT A20
@@ -30,4 +30,3 @@ SELECT profile_name,
        status
 FROM   dba_lockdown_profiles
 ORDER BY 1;
-
