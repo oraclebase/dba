@@ -1,10 +1,10 @@
 -- -----------------------------------------------------------------------------------
--- File Name    : https://oracle-base.com/dba/18c/lockdown_profiles.sql
+-- File Name    : https://oracle-base.com/dba/18c/lockdown_rules.sql
 -- Author       : Tim Hall
--- Description  : Displays information about lockdown profiles.
+-- Description  : Displays information about lockdown rules applis in the current container.
 -- Requirements : Access to the DBA views.
--- Call Syntax  : @lockdown_profiles
--- Last Modified: 30/06/2018
+-- Call Syntax  : @lockdown_rules
+-- Last Modified: 06/01/2019 - Switch to OUTER JOIN and alter ORDER BY.
 -- -----------------------------------------------------------------------------------
 SET LINESIZE 200
 
@@ -23,5 +23,5 @@ SELECT lr.rule_type,
        lr.con_id,
        p.pdb_name
 FROM   v$lockdown_rules lr
-       JOIN cdb_pdbs p ON p.con_id = lr.con_id
-ORDER BY 1;
+       LEFT OUTER JOIN cdb_pdbs p ON lr.con_id = p.con_id
+ORDER BY 1, 2;
