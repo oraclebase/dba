@@ -5,6 +5,7 @@
 -- Requirements : Access to the DBA views.
 -- Call Syntax  : @lockdown_profiles
 -- Last Modified: 05/01/2019 - Increase the LINESIZE setting and include PDB ID and name.
+--                             Switch to LEFT OUTER JOIN. Alter column order.
 -- -----------------------------------------------------------------------------------
 SET LINESIZE 250
 
@@ -23,14 +24,14 @@ SELECT lp.con_id,
        p.pdb_name,
        lp.profile_name,
        lp.rule_type,
+       lp.status,
        lp.rule,
        lp.clause,
        lp.clause_option,
        lp.option_value,
        lp.min_value,
        lp.max_value,
-       lp.list,
-       lp.status
+       lp.list
 FROM   cdb_lockdown_profiles lp
-       JOIN cdb_pdbs p ON p.con_id = lp.con_id
+       LEFT OUTER JOIN cdb_pdbs p ON lp.con_id = p.con_id
 ORDER BY 1, 3;
