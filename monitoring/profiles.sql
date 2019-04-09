@@ -10,6 +10,10 @@ SET LINESIZE 150 PAGESIZE 20 VERIFY OFF
 
 BREAK ON profile SKIP 1
 
+COLUMN profile FORMAT A35
+COLUMN resource_name FORMAT A40
+COLUMN limit FORMAT A15
+
 SELECT profile,
        resource_type,
        resource_name,
