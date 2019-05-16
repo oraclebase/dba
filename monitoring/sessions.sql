@@ -4,7 +4,7 @@
 -- Description  : Displays information on all database sessions.
 -- Requirements : Access to the V$ views.
 -- Call Syntax  : @sessions
--- Last Modified: 21-FEB-2005
+-- Last Modified: 16-MAY-2019
 -- -----------------------------------------------------------------------------------
 SET LINESIZE 500
 SET PAGESIZE 1000
@@ -25,11 +25,14 @@ SELECT NVL(s.username, '(oracle)') AS username,
        s.lockwait,
        s.status,
        s.service_name,
-       s.module,
        s.machine,
        s.program,
        TO_CHAR(s.logon_Time,'DD-MON-YYYY HH24:MI:SS') AS logon_time,
-       s.last_call_et AS last_call_et_secs
+       s.last_call_et AS last_call_et_secs,
+       s.module,
+       s.action,
+       s.client_info,
+       s.client_identifier
 FROM   v$session s,
        v$process p
 WHERE  s.paddr = p.addr
