@@ -2,8 +2,10 @@
 -- File Name    : https://oracle-base.com/dba/script_creation/logon_as_user.sql
 -- Author       : Tim Hall
 -- Description  : Displays the DDL for a specific user.
+--                Better approaches included here.
+--                https://oracle-base.com/articles/misc/proxy-users-and-connect-through
 -- Call Syntax  : @logon_as_user (username)
--- Last Modified: 28/01/2006
+-- Last Modified: 28/01/2006 - Added link to article.
 -- -----------------------------------------------------------------------------------
 
 set serveroutput on verify off
