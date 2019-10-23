@@ -21,6 +21,6 @@ SELECT tablespace_name,
        critical_operator,
        critical_value
 FROM   dba_tablespace_thresholds
-ORDER BY tablespace_name;
+ORDER BY tablespace_name, metrics_name;
 
 SET LINESIZE 80
