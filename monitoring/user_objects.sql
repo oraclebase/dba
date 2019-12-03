@@ -3,7 +3,7 @@
 -- Author       : Tim Hall
 -- Description  : Displays the objects owned by the current user.
 -- Requirements : 
--- Call Syntax  : @dynamic_memory
+-- Call Syntax  : @user_objects
 -- Last Modified: 23-OCT-2019
 -- -----------------------------------------------------------------------------------
 
