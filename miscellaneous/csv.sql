@@ -156,7 +156,7 @@ PROCEDURE generate_all (p_dir        IN  VARCHAR2,
   l_cursor    PLS_INTEGER;
   l_rows      PLS_INTEGER;
   l_col_cnt   PLS_INTEGER;
-  l_desc_tab  DBMS_SQL.desc_tab;
+  l_desc_tab  DBMS_SQL.desc_tab2;
   l_buffer    VARCHAR2(32767);
   l_is_str    BOOLEAN;
 
