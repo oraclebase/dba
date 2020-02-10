@@ -171,7 +171,7 @@ BEGIN
     RAISE_APPLICATION_ERROR(-20000, 'You must specify a query or a REF CURSOR.');
   END IF;
   
-  DBMS_SQL.describe_columns (l_cursor, l_col_cnt, l_desc_tab);
+  DBMS_SQL.describe_columns2 (l_cursor, l_col_cnt, l_desc_tab);
 
   FOR i IN 1 .. l_col_cnt LOOP
     DBMS_SQL.define_column(l_cursor, i, l_buffer, 32767 );
