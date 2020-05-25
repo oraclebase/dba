@@ -8,6 +8,11 @@
 -- -----------------------------------------------------------------------------------
 SET LINESIZE 200 VERIFY OFF
 
+COLUMN owner FORMAT A30
+COLUMN object_name FORMAT A30
+COLUMN grantor FORMAT A30
+COLUMN grantee FORMAT A30
+
 SELECT owner,
        table_name AS object_name,
        grantor,
