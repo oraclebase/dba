@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE clob_to_file (p_clob      IN OUT NOCOPY CLOB,
+CREATE OR REPLACE PROCEDURE clob_to_file (p_clob      IN  CLOB,
                                           p_dir       IN  VARCHAR2,
                                           p_filename  IN  VARCHAR2)
 -- -----------------------------------------------------------------------------------
@@ -6,6 +6,7 @@ CREATE OR REPLACE PROCEDURE clob_to_file (p_clob      IN OUT NOCOPY CLOB,
 -- Author       : Tim Hall
 -- Description  : Writes the contents of a CLOB to a file.
 -- Last Modified: 26/02/2019 - Taken from 2005 article.
+--                22/05/2020 - BLOB parameter switched from IN OUT NOCOPY to IN.
 -- -----------------------------------------------------------------------------------
 AS
   l_file    UTL_FILE.FILE_TYPE;
