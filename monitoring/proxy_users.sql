@@ -7,6 +7,8 @@
 -- Last Modified: 02/06/2020
 -- -----------------------------------------------------------------------------------
 
+SET VERIFY OFF
+
 COLUMN proxy FORMAT A30
 COLUMN client FORMAT A30
 
