@@ -18,6 +18,7 @@ CREATE OR REPLACE PACKAGE csv AS
 --   19-MAY-2016  Tim Hall  Add REF CURSOR support.
 --   15-JAN-2019  Tim Hall  Add DBMS_OUTPUT support.
 --   31-JAN-2019  Tim Hall  Add set_quotes procedure.
+--   22-NOV-2020  Tim Hall  Amend set_quotes to allow control of string escaping.
 -- --------------------------------------------------------------------------
 
 PROCEDURE generate (p_dir        IN  VARCHAR2,
@@ -35,7 +36,8 @@ PROCEDURE output_rc (p_refcursor  IN OUT SYS_REFCURSOR);
 PROCEDURE set_separator (p_sep  IN  VARCHAR2);
 
 PROCEDURE set_quotes (p_add_quotes  IN  BOOLEAN := TRUE,
-                      p_quote_char  IN  VARCHAR2 := '"');
+                      p_quote_char  IN  VARCHAR2 := '"',
+                      p_escape      IN  BOOLEAN := TRUE);
 
 END csv;
 /
@@ -74,12 +76,16 @@ CREATE OR REPLACE PACKAGE BODY csv AS
 --   19-MAY-2016  Tim Hall  Add REF CURSOR support.
 --   15-JAN-2019  Tim Hall  Add DBMS_OUTPUT support.
 --   31-JAN-2019  Tim Hall  Add quotes to strings. Code suggested by Moose T.
+--   22-NOV-2020  Tim Hall  Amend set_quotes to allow control of string escaping.
+--                          Amend generate_all to include optional string escapes.
+--                          Suggested by Anssi Kanninen.
 -- --------------------------------------------------------------------------
 
 g_out_type    VARCHAR2(1) := 'F';
 g_sep         VARCHAR2(5) := ',';
 g_add_quotes  BOOLEAN     := TRUE;
 g_quote_char  VARCHAR2(1) := '"';
+g_escape      BOOLEAN     := TRUE;
 
 -- Prototype for hidden procedures.
 PROCEDURE generate_all (p_dir        IN  VARCHAR2,
@@ -218,8 +224,13 @@ BEGIN
       DBMS_SQL.COLUMN_VALUE(l_cursor, i, l_buffer);
       -- Optionally add quotes for strings.
       IF g_add_quotes AND l_is_str  THEN
-        put(l_file, g_quote_char); 
-        put(l_file, l_buffer);
+        put(l_file, g_quote_char);
+        -- Optionally escape the quote character in the string.
+        IF g_escape THEN 
+          put(l_file, replace(l_buffer, g_quote_char, '\'||g_quote_char));
+        ELSE
+          put(l_file, l_buffer);
+        END IF;
         put(l_file, g_quote_char);
       ELSE
         put(l_file, l_buffer);
@@ -254,10 +265,12 @@ END set_separator;
 
 -- Alter separator from default.
 PROCEDURE set_quotes (p_add_quotes  IN  BOOLEAN := TRUE,
-                      p_quote_char  IN  VARCHAR2 := '"') AS
+                      p_quote_char  IN  VARCHAR2 := '"',
+                      p_escape      IN  BOOLEAN := TRUE) AS
 BEGIN
   g_add_quotes := NVL(p_add_quotes, TRUE);
   g_quote_char := NVL(SUBSTR(p_quote_char,1,1), '"');
+  g_escape     := NVL(p_escape, TRUE);
 END set_quotes;
 
 
