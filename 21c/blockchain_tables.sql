@@ -1,7 +1,7 @@
 -- -----------------------------------------------------------------------------------
 -- File Name    : https://oracle-base.com/dba/21c/blockchain_tables.sql
 -- Author       : Tim Hall
--- Description  : Display certificates in the specified schema, or all schemas.
+-- Description  : Display blockchain tables in the specified schema, or all schemas.
 -- Call Syntax  : @blockchain_tables (schema or all)
 -- Last Modified: 23/12/2020
 -- -----------------------------------------------------------------------------------
@@ -22,3 +22,4 @@ SELECT schema_name,
        hash_algorithm  
 FROM   dba_blockchain_tables 
 WHERE  schema_name = DECODE(UPPER('&1'), 'ALL', schema_name, UPPER('&1'));
+
