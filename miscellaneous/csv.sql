@@ -79,6 +79,9 @@ CREATE OR REPLACE PACKAGE BODY csv AS
 --   22-NOV-2020  Tim Hall  Amend set_quotes to allow control of string escaping.
 --                          Amend generate_all to include optional string escapes.
 --                          Suggested by Anssi Kanninen.
+--   02-MAR-2021  Tim Hall  Amend generate_all to also escape the escape character
+--                          when present in the string.
+--                          Suggested by Anssi Kanninen.
 -- --------------------------------------------------------------------------
 
 g_out_type    VARCHAR2(1) := 'F';
@@ -225,12 +228,12 @@ BEGIN
       -- Optionally add quotes for strings.
       IF g_add_quotes AND l_is_str  THEN
         put(l_file, g_quote_char);
-        -- Optionally escape the quote character in the string.
-        IF g_escape THEN 
-          put(l_file, replace(l_buffer, g_quote_char, '\'||g_quote_char));
-        ELSE
-          put(l_file, l_buffer);
+        -- Optionally escape the quote character and the escape character in the string.
+        IF g_escape THEN
+          l_buffer := replace(l_buffer, '\', '\\');
+          l_buffer := replace(l_buffer, g_quote_char, '\'||g_quote_char);
         END IF;
+        put(l_file, l_buffer);
         put(l_file, g_quote_char);
       ELSE
         put(l_file, l_buffer);
