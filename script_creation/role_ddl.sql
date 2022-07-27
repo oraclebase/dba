@@ -3,7 +3,7 @@
 -- Author       : Tim Hall
 -- Description  : Displays the DDL for a specific role.
 -- Call Syntax  : @role_ddl (role)
--- Last Modified: 28/01/2006
+-- Last Modified: 27/07/2022 - Increase long to 1000000.
 -- -----------------------------------------------------------------------------------
 
 set long 1000000 longchunksize 20000 pagesize 0 linesize 1000 feedback off verify off trimspool on
