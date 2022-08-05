@@ -22,6 +22,7 @@ CREATE OR REPLACE PACKAGE ftp AS
 --   12-Jun-2008  Tim Hall  get_reply: Moved to pakage specification.
 --   22-Apr-2009  Tim Hall  nlst: Added to return list of file names only (suggested by Julian and John Duncan)
 --   24-May-2014  Tim Hall  Added license information.
+--   05-Aug-2022  Tim Hall  Add passive_use_login_host (suggested by Martin Glass).
 -- --------------------------------------------------------------------------
 
 TYPE t_string_table IS TABLE OF VARCHAR2(32767);
@@ -125,6 +126,8 @@ PROCEDURE rmdir (p_conn  IN OUT NOCOPY  UTL_TCP.connection,
                  p_dir   IN             VARCHAR2);
 
 PROCEDURE convert_crlf (p_status  IN  BOOLEAN);
+
+PROCEDURE passive_use_login_host (p_status  IN  BOOLEAN);
 
 END ftp;
 /
