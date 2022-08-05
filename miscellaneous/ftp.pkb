@@ -68,14 +68,20 @@ CREATE OR REPLACE PACKAGE BODY ftp AS
 --   05-Jan-2018  Tim Hall  get_local_ascii_data : Switch from LOADFROMFILE to LOADCLOBFROMFILE.
 --                          get_local_binary_data : Switch from LOADFROMFILE to LOADBLOBFROMFILE.
 --                          (suggested by Stephen Skene)
+--   05-Aug-2022  Tim Hall  Add passive_use_login_host and amend get_passive to allow it to toggle between the two approaches
+--                          for handling the passive host. Previously the alternative approach was commented out.
+--                          (suggested by Martin Glass).
 -- --------------------------------------------------------------------------
 
-g_reply         t_string_table := t_string_table();
-g_binary        BOOLEAN := TRUE;
-g_debug         BOOLEAN := TRUE;
-g_convert_crlf  BOOLEAN := TRUE;
+g_reply            t_string_table := t_string_table();
+g_binary           BOOLEAN := TRUE;
+g_debug            BOOLEAN := TRUE;
+g_convert_crlf     BOOLEAN := TRUE;
+g_pasv_login_host  BOOLEAN := TRUE;
 
 PROCEDURE debug (p_text  IN  VARCHAR2);
+
+
 
 -- --------------------------------------------------------------------------
 FUNCTION login (p_host    IN  VARCHAR2,
@@ -105,7 +111,7 @@ FUNCTION get_passive (p_conn  IN OUT NOCOPY  UTL_TCP.connection)
 -- --------------------------------------------------------------------------
   l_conn    UTL_TCP.connection;
   l_reply   VARCHAR2(32766);
-  --l_host    VARCHAR(100);
+  l_host    VARCHAR(400);
   l_port1   NUMBER(10);
   l_port2   NUMBER(10);
 BEGIN
@@ -113,13 +119,16 @@ BEGIN
   l_reply := g_reply(g_reply.last);
 
   l_reply := REPLACE(SUBSTR(l_reply, INSTR(l_reply, '(') + 1, (INSTR(l_reply, ')')) - (INSTR(l_reply, '('))-1), ',', '.');
-  --l_host  := SUBSTR(l_reply, 1, INSTR(l_reply, '.', 1, 4)-1);
+  IF g_pasv_login_host THEN
+    l_host  := p_conn.remote_host;
+  ELSE
+    l_host  := SUBSTR(l_reply, 1, INSTR(l_reply, '.', 1, 4)-1);
+  END IF;
 
   l_port1 := TO_NUMBER(SUBSTR(l_reply, INSTR(l_reply, '.', 1, 4)+1, (INSTR(l_reply, '.', 1, 5)-1) - (INSTR(l_reply, '.', 1, 4))));
   l_port2 := TO_NUMBER(SUBSTR(l_reply, INSTR(l_reply, '.', 1, 5)+1));
 
-  --l_conn := utl_tcp.open_connection(l_host, 256 * l_port1 + l_port2);
-  l_conn := utl_tcp.open_connection(p_conn.remote_host, 256 * l_port1 + l_port2);
+  l_conn := UTL_TCP.open_connection(l_host, 256 * l_port1 + l_port2);
   return l_conn;
 END;
 -- --------------------------------------------------------------------------
@@ -819,6 +828,16 @@ PROCEDURE convert_crlf (p_status  IN  BOOLEAN) AS
 -- --------------------------------------------------------------------------
 BEGIN
   g_convert_crlf := p_status;
+END;
+-- --------------------------------------------------------------------------
+
+
+
+-- --------------------------------------------------------------------------
+PROCEDURE passive_use_login_host (p_status  IN  BOOLEAN) AS
+-- --------------------------------------------------------------------------
+BEGIN
+  g_pasv_login_host := p_status;
 END;
 -- --------------------------------------------------------------------------
 
