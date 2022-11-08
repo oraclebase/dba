@@ -29,8 +29,6 @@ COLUMN options FORMAT A7
 COLUMN preference_overrides_parameter FORMAT A30
 COLUMN publish FORMAT A7
 COLUMN options FORMAT A7
-COLUMN options FORMAT A7
-COLUMN options FORMAT A7
 COLUMN stale_percent FORMAT A13
 COLUMN stat_category FORMAT A28
 COLUMN table_cached_blocks FORMAT A19
