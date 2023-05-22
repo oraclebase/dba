@@ -4,7 +4,7 @@
 -- Description  : Displays privileges for the network ACLs.
 -- Requirements : Access to the DBA views.
 -- Call Syntax  : @network_acl_privileges
--- Last Modified: 30/11/2011
+-- Last Modified: 22/05/2023
 -- -----------------------------------------------------------------------------------
 SET LINESIZE 150
 
@@ -12,13 +12,17 @@ COLUMN acl FORMAT A50
 COLUMN principal FORMAT A20
 COLUMN privilege FORMAT A10
 
-SELECT acl,
-       principal,
-       privilege,
-       is_grant,
-       TO_CHAR(start_date, 'DD-MON-YYYY') AS start_date,
-       TO_CHAR(end_date, 'DD-MON-YYYY') AS end_date
-FROM   dba_network_acl_privileges
-ORDER BY acl, principal, privilege;
+SELECT nap.acl,
+       host,
+       lower_port,
+       upper_port,
+       nap.principal,
+       nap.privilege,
+       nap.is_grant,
+       TO_CHAR(nap.start_date, 'DD-MON-YYYY') AS start_date,
+       TO_CHAR(nap.end_date, 'DD-MON-YYYY') AS end_date
+FROM   dba_network_acl_privileges nap
+       JOIN dba_network_acls na on na.acl = nap.acl
+ORDER BY nap.acl, nap.principal, nap.privilege;
 
 SET LINESIZE 80
