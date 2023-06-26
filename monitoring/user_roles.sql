@@ -3,7 +3,7 @@
 -- Author       : Tim Hall
 -- Description  : Displays a list of all roles and privileges granted to the specified user.
 -- Requirements : Access to the DBA views.
--- Call Syntax  : @user_roles
+-- Call Syntax  : @user_roles (username)
 -- Last Modified: 26/06/2023
 -- -----------------------------------------------------------------------------------
 set serveroutput on
