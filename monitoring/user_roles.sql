@@ -2,21 +2,23 @@
 -- File Name    : https://oracle-base.com/dba/monitoring/user_roles.sql
 -- Author       : Tim Hall
 -- Description  : Displays a list of all roles and privileges granted to the specified user.
--- Requirements : Access to the USER views.
+-- Requirements : Access to the DBA views.
 -- Call Syntax  : @user_roles
--- Last Modified: 15/07/2000
+-- Last Modified: 26/06/2023
 -- -----------------------------------------------------------------------------------
-SET SERVEROUTPUT ON
-SET VERIFY OFF
+set serveroutput on
+set verify off
 
-SELECT a.granted_role,
+select a.granted_role,
        a.admin_option
-FROM   user_role_privs a
-ORDER BY a.granted_role;
+from   dba_role_privs a
+where  a.grantee = upper('&1')
+order by a.granted_role;
 
-SELECT a.privilege,
+select a.privilege,
        a.admin_option
-FROM   user_sys_privs a
-ORDER BY a.privilege;
+from   dba_sys_privs a
+where  a.grantee = upper('&1')
+order by a.privilege;
                
-SET VERIFY ON
+set verify on
