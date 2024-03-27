@@ -6,14 +6,14 @@
 -- Call Syntax  : @directory_permissions (directory_name)
 -- Last Modified: 09/02/2016
 -- -----------------------------------------------------------------------------------
-SET LINESIZE 200
+set linesize 200
 
-COLUMN grantee   FORMAT A20
-COLUMN owner     FORMAT A10
-COLUMN grantor   FORMAT A20
-COLUMN privilege FORMAT A20
+column grantee   format a20
+column owner     format a10
+column grantor   format a20
+column privilege format a20
 
-COLUMN 
-SELECT * 
-FROM   dba_tab_privs 
-WHERE  table_name = UPPER('&1');
+column 
+select * 
+from   dba_tab_privs 
+where  table_name = upper('&1');
