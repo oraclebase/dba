@@ -7,6 +7,7 @@ CREATE OR REPLACE PROCEDURE clob_to_file (p_clob      IN  CLOB,
 -- Description  : Writes the contents of a CLOB to a file.
 -- Last Modified: 26/02/2019 - Taken from 2005 article.
 --                22/05/2020 - BLOB parameter switched from IN OUT NOCOPY to IN.
+--                03/07/2024 - Added FFLUSH, as suggested by Paul Joyce.
 -- -----------------------------------------------------------------------------------
 AS
   l_file    UTL_FILE.FILE_TYPE;
@@ -19,6 +20,7 @@ BEGIN
   LOOP
     DBMS_LOB.read (p_clob, l_amount, l_pos, l_buffer);
     UTL_FILE.put(l_file, l_buffer);
+    UTL_FILE.fflush(l_file);
     l_pos := l_pos + l_amount;
   END LOOP;
 EXCEPTION
