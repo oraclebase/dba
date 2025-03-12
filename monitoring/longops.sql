@@ -23,4 +23,5 @@ SELECT s.sid,
 FROM   v$session s,
        v$session_longops sl
 WHERE  s.sid     = sl.sid
-AND    s.serial# = sl.serial#;
+AND    s.serial# = sl.serial#
+AND    time_remaining > 0;
